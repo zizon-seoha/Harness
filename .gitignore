@@ -1,0 +1,25 @@
+# 시크릿
+.env
+.env.*
+!.env.example
+
+# 개인 로컬 지침
+CLAUDE.local.md
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 프론트
+node_modules/
+dist/
+
+# DB
+*.db
+*.sqlite
+*.sqlite3

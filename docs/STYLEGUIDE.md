@@ -1,38 +1,23 @@
-﻿# Style Guide
+# Style Guide
 
-## C# 규칙
+스택 무관 **보편 스타일 원칙**. 언어별 구체 금지패턴은 `.claude/rules/*.md`가 담당한다(경로 스코프로 해당 파일 만질 때 로드).
 
-- 공개 타입, 메서드, 프로퍼티는 `PascalCase`를 사용합니다.
-- private 직렬화 필드는 `_camelCase`를 사용합니다.
-- 지역 변수와 파라미터는 `camelCase`를 사용합니다.
-- Inspector 노출이 필요할 때는 `public` 필드보다 `[SerializeField] private`를 우선합니다.
-- 외부에서 읽기만 필요한 값은 `private` + getter 또는 메서드로 제공합니다.
-- bool 상태값은 기본적으로 `private`으로 두고 필요 시 읽기 전용 접근만 제공합니다.
+## 보편 원칙
 
-## Unity 규칙
+- 명명은 각 언어 관례를 따르되 한 프로젝트 안에서 일관되게 쓴다.
+- 죽은 디버깅 코드(임시 출력, 주석 처리한 코드 블록)는 커밋하지 않는다.
+- 조정 가능한 값은 흩뿌리지 말고 명명 상수로 둔다.
+- 새 변수·함수·모듈을 추가하기 전에 기존 동일 책임 코드가 있는지 먼저 확인하고 재사용한다.
 
-- `MonoBehaviour`는 씬 동작과 Unity 라이프사이클 책임에 집중합니다.
-- 게임플레이 로직은 가능하면 일반 C# 클래스와 분리합니다.
-- Script Execution Order에 의존하는 암묵적 초기화는 피합니다.
-- Prefab, Animator, Collider, Rigidbody 설정으로 해결할 수 있는 문제를 코드로 과도하게 우회하지 않습니다.
-- 조정 가능한 값은 매직 넘버로 흩뿌리지 말고 직렬화 필드 또는 명명된 상수로 둡니다.
-- Input은 Unity Legacy Input 기준으로 구현해줘.
+## 주석
 
-## 금지 또는 제한 규칙
+- 주석은 한국어로 작성한다.
+- 코드만으로 드러나지 않는 맥락(상태 전이 이유, 의도, 외부 의존 가정)을 우선 기록한다.
 
-- `Resources.Load`를 기본 자원 접근 방식으로 사용하지 않습니다.
-- `GameObject.Find`, `GameObject.FindWithTag`, `FindAnyObjectByType`, `FindFirstObjectByType`, `FindObjectOfType`를 기본 참조 방식으로 사용하지 않습니다.
-- `GetComponent`, `TryGetComponent`를 `Update()`나 반복 루프에서 매번 호출하지 않습니다.
-- 이름, 태그, 경로 문자열에 강하게 의존하는 탐색 로직을 기본 구조로 사용하지 않습니다.
-- 명확한 필요와 생명주기 책임 없이 새 싱글톤을 도입하지 않습니다.
+## 언어별 규칙
 
-## 주석 규칙
+언어 레벨 금지패턴·스타일은 아래 경로 스코프 규칙이 담당한다.
 
-- 초보자이기 때문에 기본적으로 주석은 달아줍니다.
-- 주석은 기본적으로 한글로 작성합니다.
-- Inspector 수동 연결 포인트, 상태 전이 이유, 라이프사이클 의도처럼 코드만으로 바로 드러나지 않는 맥락을 우선 기록합니다.
-
-## 중복 구현 방지
-
-- 새 변수나 메서드를 추가하기 전에 기존 동일 책임 코드가 있는지 먼저 확인합니다.
-- 기존 매니저, 컴포넌트, 유틸리티, ScriptableObject를 우선 재사용합니다.
+- Python (`*.py`) → `.claude/rules/python.md`
+- 프론트 (`*.ts/tsx/jsx/js`) → `.claude/rules/frontend.md`
+- 시크릿(상시) → `.claude/rules/secrets.md`
