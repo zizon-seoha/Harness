@@ -1,16 +1,22 @@
-# Architecture
+# 아키텍처 상세 — 소마 코드배틀
 
-스택 무관 구조 원칙. 구체 폴더 레이아웃은 `docs/STACK.md`를 따른다.
+CLAUDE.md에서 `@docs/architecture.md`로 참조.
 
-## 구조 원칙
+## 디렉토리 (모노레포: 루트 아래 frontend/ + backend/)
+- 프론트(React+Vite+TS): `frontend/src/` — `components/`(공통) · `pages/` · `api/`(호출) · `store/`(Context 전역상태) · `utils/`
+- 백(Spring): `backend/src/main/java/<pkg>/` 아래 `controller/`(API) · `service/`(비즈니스) · `repository/`(JPA) · `entity/`(DB) · `dto/` · `config/`(설정/스케줄러). 마이그레이션 `backend/src/main/resources/db/migration/`(Flyway).
 
-- 작은 수직 슬라이스를 누적한다. 큰 프레임워크나 추상 계층을 먼저 만들지 않는다.
-- 연결/라우팅 코드와 도메인 로직을 분리한다. 프레임워크 진입점(라우터, 핸들러, 컴포넌트)은 얇게 두고, 핵심 로직은 프레임워크 무관 모듈로 뺀다.
-- 외부 의존(DB, 외부 API, 스케줄러)은 경계 모듈 뒤에 둔다. 도메인 로직이 외부 SDK에 직접 묶이지 않게 한다.
-- 동일 책임 코드가 이미 있으면 재사용한다. 새 모듈·유틸을 만들기 전에 기존 것을 먼저 확인한다.
+## 중요 컴포넌트 (Spring)
+- 스케줄러 컴포넌트(`@Scheduled`) — 자동 출제/피드백.
+- 회차/요일/주제 판정 유틸 — isSunday/isFourthSunday 동등 로직.
+- 문제 생성 서비스 — 3단계 필터.
+- 피드백 서비스 — 즉시/기간.
+- 랭킹 서비스 — 집계.
+- 설정 — `application.yml`(환경변수/datasource).
+- `frontend/src/utils/dateUtils` — isSunday/isFourthSunday.
 
-## 변경 원칙
-
-- 새 폴더, 새 패키지, 대규모 재편은 필요가 명확할 때만 한다.
-- 현재 task 범위를 넘어서는 구조 정리는 별도 요청 없이는 하지 않는다.
-- 외부 의존(벤더 라이브러리, 생성 코드) 내부 구조는 사용자 요청 없이 바꾸지 않는다.
+## 변경 시 함께 확인 (영향도)
+- 출제 스케줄 변경 → 스케줄러 컴포넌트 + 요일/회차 유틸.
+- 점수 규칙 변경 → 제출 서비스(점수 계산) + `docs/domain.md`.
+- 랭킹 규칙 변경 → 랭킹 서비스 + `docs/domain.md`.
+- 환경변수 키 추가 → `application.yml` + `.env`(또는 환경) + CLAUDE.md 포인터.

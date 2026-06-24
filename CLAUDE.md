@@ -1,56 +1,60 @@
-# CLAUDE.md
+# 소마 코드배틀 (Soma Code Battle)
 
-이 저장소는 Claude Code용 **범용 작업 하네스**다. 여러 프로젝트에 재사용한다.
-스택 사실은 한 곳(`docs/STACK.md`)에 격리하고, 나머지 문서는 스택 무관 작업 규칙만 담는다.
+<!--
+  작성 원칙:
+  1) 매 세션 로드된다 → "항상 참인 것"만 넣는다.
+  2) 짧게 (~200줄 이하). 길면 클로드가 무시한다.
+  3) 코드만 봐서 알 수 있는 건 적지 않는다.
+  4) 각 줄에 물어봐라: "이걸 지우면 클로드가 실수할까?" 아니면 삭제.
+  상세는 @ 포인터로 링크하고 인라인하지 않는다.
+-->
 
-## 재사용 경계
+## What — 이 프로젝트가 무엇인가
+- 한 줄: 소마고 교내 AI 코딩 배틀 — 2일마다 AI가 문제 자동 출제, 학생이 익명/실명으로 풀면 AI가 피드백·점수, 다양한 랭킹.
+- 스택(선언): React + Vite + TypeScript + Tailwind (전역 상태 Context API) / Spring + MySQL + JPA/Hibernate + Flyway / OpenAI API / Judge0 / 배포 Vercel(프론트)+Railway(백).
+- 진입점: 백 Spring Boot 메인(`@SpringBootApplication`) · 프론트 Vite(`src/main`).
 
-| 계층 | 위치 | 내용 | 교체 주기 |
-| --- | --- | --- | --- |
-| 프로젝트 | `docs/STACK.md` | 명령어, 폴더 구조, 프레임워크/버전, 도메인, 사람확인 항목 | 프로젝트마다 |
-| 언어 | `.claude/rules/*.md` | 언어 레벨 금지패턴·스타일 (glob 경로 스코프) | 언어 바뀔 때만 |
-| 하네스 | `CLAUDE.md` + 나머지 `docs/*` | 스택 무관 작업원칙·흐름·문서규칙 | 거의 고정 |
+> 신규 구축: 코드는 이 사양 기준으로 새로 작성한다(기존 구현 없음).
 
-**경계 침범 금지**: 명령어는 `rules/`에 넣지 않는다(→ STACK.md). 금지패턴은 STACK.md에 넣지 않는다(→ rules/). 같은 스택 새 프로젝트는 STACK.md만 교체하면 동작해야 한다.
+## Why — 코드만 봐선 모를 결정
+- 랭킹은 별도 집계 테이블 없이 `submissions.submitted_at`로 직접 집계한다. (user, problem)당 **마지막 제출만** 점수 반영.
+- 점수는 항상 소수점 2자리로 유지한다.
+- API 응답은 항상 `{ data, error, status }` 형태로 통일한다.
+- OpenAI/Judge0 키가 없으면 **데모 모드**로 전체 플로우가 동작한다(외부 호출 없이).
+- 월간 랭킹은 4번째 주 일요일에만 공개(그 외 잠금+D-day). 일요일은 출제 없이 열람만.
 
-## 문서 맵
+## How — 빌드 / 실행 / 검증
+### 명령어 (클로드가 추측 못 하는 것)
+- 프론트(React+Vite+TS): `npm install` · `npm run dev`(:5173) · `npm run build` · `npm run preview`
+- 백(Spring): `./gradlew bootRun`(:8080) · 마이그레이션 Flyway(`./gradlew flywayMigrate`)
+- lint/test 명령은 프로젝트 셋업 시 확정해 여기 갱신(현재 미정).
 
-- `CLAUDE.md`: 시작 문서. 문서맵 + 에이전트 원칙.
-- `docs/STACK.md`: 스택 사실(언어/프레임워크/폴더/명령/도메인). **프로젝트 계층, 단일 출처.**
-- `docs/ARCHITECTURE.md`: 스택 무관 구조 원칙. 구체 폴더는 STACK.md 참조.
-- `docs/STYLEGUIDE.md`: 스택 무관 보편 스타일 원칙. 언어별 금지패턴은 `.claude/rules/`.
-- `docs/TESTING.md`: 검증 게이트. 실행 명령은 STACK.md 참조.
-- `docs/WORKFLOW.md`: task 진행 순서 + 상태 머신.
-- `docs/TASK_WRITING.md`: task 문서 작성/갱신 규칙(What/How 분리).
-- `docs/HARNESS.md`: 하네스 운영 + 이탈 대응.
-- `docs/PLANS.md`: task 보드 + 상태 범례.
-- `.claude/rules/*.md`: 경로 스코프 코딩 규칙(매칭 파일 만질 때만 로드).
-- `.claude/commands/new-task.md`: `/new-task` 슬래시 커맨드.
-- `Tasks/`: 실제 task 문서가 들어가는 곳.
+### 워크플로
+- 큰 변경은 Plan Mode로 승인 후 진행. 한 번에 하나의 task만.
+- 코드 변경 후 변경 범위의 검증 게이트를 통과시킨다 → @docs/testing.md. 못 돌렸으면 "안 돌림" 명시.
+- 이력/되돌리기는 git 커밋 + `/rewind`.
 
-@docs/STACK.md
+## 코드 스타일 (언어 기본값과 다른 것만)
+- 상세 규칙은 경로스코프로 자동 로드 → `@.claude/rules/`.
+- 요약: Java/Spring(클래스 PascalCase·메서드 camelCase, 생성자 주입) / React camelCase·컴포넌트 PascalCase / 점수 2자리.
 
-## 에이전트 원칙 (스코프 크리프 방어)
+## 경계 (Boundaries) — 건드리지 말 것
+- **IMPORTANT**: API 키/시크릿 절대 하드코딩 금지. `.env`만 사용. 노출 금지(@.claude/rules/secrets.md).
+- **YOU MUST**: 외부 API(OpenAI·Judge0)는 키 없을 때 데모 모드로 동작시킨다(실호출 강제 금지).
+- 요청/현 task 범위 밖 구현·추상화·문서 확장 금지(스코프 크리프).
+- 작성한 코드는 현재 task 범위 밖에서 임의 리팩터하지 않는다.
 
-- 사용자 요청과 현재 task 범위를 벗어나는 구현, 추상화, 문서 확장은 하지 않는다.
-- "있으면 좋다 / 정리된다 / 나중에 쓸 수 있다"는 이유만으로 필드, 옵션, 모듈, 문서 절차를 추가하지 않는다.
-- 요청 또는 현재 task 완료 조건에 직접 필요하지 않은 선택 기능은 구현 전에 사용자 승인을 받는다.
-- 한 번에 하나의 task만 진행한다. 끝나기 전 다음 task로 넘어가지 않는다.
-- 큰 구조 변경이나 연관 리팩터링은 별도 요청 없이 진행하지 않는다.
-- 구현 전 관련 코드와 기존 유틸을 먼저 확인하고 재사용을 우선한다.
+## 포인터 (Pointers) — 상세는 링크로
+- 도메인 상세(스케줄/점수/랭킹/주간주제): @docs/domain.md
+- 아키텍처 상세: @docs/architecture.md
+- 검증 게이트: @docs/testing.md
+- 언어 규칙: @.claude/rules/
+- 환경변수 (키 이름만 — 값은 `.env`):
+  - 시크릿: `DATABASE_URL`, `OPENAI_API_KEY`, `JUDGE0_API_KEY`, `SECRET_KEY`
+  - 모델 기본값(여기 1곳만 기록): `OPENAI_MODEL_GENERATION`=gpt-5.4-mini · `OPENAI_MODEL_INSTANT_FEEDBACK`/`OPENAI_MODEL_ROUND_FEEDBACK`=gpt-5.4-nano · `OPENAI_MODEL_WEEKLY_FEEDBACK`/`OPENAI_MODEL_MONTHLY_FEEDBACK`=gpt-5.4-mini
+  - 기타: `ADMIN_EMAIL` 외 `.env.example` 참조
 
-## 운영
-
-- 작업 흐름·상태 갱신 → `docs/WORKFLOW.md`.
-- 하네스 규칙 추가·이탈 대응 → `docs/HARNESS.md` (금지 문구를 반복 누적하지 말고 실패 지점을 먼저 찾는다).
-- 큰 변경은 Plan Mode로 계획을 승인받고 진행한다.
-- 작업 이력은 git 커밋으로 남기고, 되돌리기는 `/rewind`를 쓴다. 별도 수동 로그를 만들지 않는다.
-
-## 시크릿
-
-시크릿은 `.env`에서만 로드한다. 키·토큰을 코드·로그·출력·커밋에 절대 포함하지 않는다. 자세한 규칙은 `.claude/rules/secrets.md`.
-
-## 문서·언어
-
-- 문서와 코드 주석은 한국어로 작성한다.
-- Markdown은 UTF-8로 저장한다.
+## 사람 확인 (런타임/통합 — 클로드가 검증 불가)
+- AI 문제 생성 실패 시 관리자 알림 발송 확인.
+- 마감 10분 전 알림(scheduler) 동작 확인.
+- 외부 API 키는 사람이 `.env`에 제공.

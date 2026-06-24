@@ -1,25 +1,10 @@
-# 시크릿
-.env
-.env.*
-!.env.example
-
-# 개인 로컬 지침
+# 개인용 하네스 메모
 CLAUDE.local.md
 
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+# 시크릿
+.env
+**/.env
 
-# 프론트
-node_modules/
-dist/
-
-# DB
+# 로컬 DB / 로그
 *.db
-*.sqlite
-*.sqlite3
+*.log
