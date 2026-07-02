@@ -13,5 +13,5 @@ paths:
 - 디버깅용 `System.out.println` 잔재 금지. 로깅은 SLF4J(`log.info` 등).
 - 매직넘버·매직스트링 금지. 명명 상수로 둔다.
 - 엔티티/DTO를 혼용하지 않는다(영속 엔티티를 API 응답으로 직접 노출 금지).
-- 점수 등 금액/정밀 수치는 `BigDecimal`(소수점 2자리 유지).
+- 금액/정밀 수치는 `float`/`double` 대신 `BigDecimal`을 쓴다.
 - 시크릿을 코드·로그에 넣지 않는다 (`.claude/rules/secrets.md`).

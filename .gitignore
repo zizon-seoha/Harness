@@ -1,6 +1,9 @@
 # 개인용 하네스 메모
 CLAUDE.local.md
 
+# 로컬 권한 오버라이드 (머신마다 다름)
+.claude/settings.local.json
+
 # 시크릿
 .env
 **/.env
